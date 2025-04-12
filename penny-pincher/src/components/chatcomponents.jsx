@@ -10,4 +10,4 @@ const ChatComponent = () => {
   );
 };
 
-export default ChatComponent;
+export default ChatComponent; 
