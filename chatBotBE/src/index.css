@@ -1,0 +1,36 @@
+/* The font used throughout! A cute one :) */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Nunito Sans", sans-serif;
+    color: #1F1E20;
+}
+
+body {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f5f2f8
+}
+
+.chatbot-popup {
+    background: #fff;
+    width: 400px;
+    overflow: hidden;
+    height: 600px;
+    border-radius: 25px;
+    box-shadow: 0 0 20px #c0b9c7;
+}
+
+.chat-header {
+
+}
+
+.chat-body{
+
+}
