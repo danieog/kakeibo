@@ -31,6 +31,21 @@
       );
     }
 
+    function NewDashboard({ onLogOut, onContinue, onPenny , setPage}) {
+      return (
+        <div className="container">
+          <h1>Welcome to your Dashboard</h1>
+          <p>Let's get you started. First step is to connect an account</p>
+
+          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+            <button className="button-primary" onClick={() => setPage('new finances')}> Connect a banking account </button>
+            <button className="button-primary" onClick={onPenny}> Talk to Penny </button>
+            <button className="button-primary" onClick={onLogOut}> Log Out </button>
+          </div>
+        </div>
+      );
+    }
+
     function Dashboard({ onLogOut, onContinue, onPenny }) {
       return (
         <div className="container">
@@ -38,6 +53,7 @@
           <p>This is your main hub. Ready to see your finances?</p>
 
           <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+            <button className="button-primary" onClick={onContinue}> Connect a banking account </button>
             <button className="button-primary" onClick={onContinue}> Go to Finances </button>
             <button className="button-primary" onClick={onPenny}> Talk to Penny </button>
             <button className="button-primary" onClick={onLogOut}> Log Out </button>
@@ -45,6 +61,56 @@
         </div>
       );
     }
+
+    function connectAnAccount({ onLogOut, onBack }){
+      return(
+        <div className="container">
+          <h1> Securely connect a banking account through Plaid </h1>
+          /* Implement plaid here */
+          </div>
+      );
+    }
+
+    function NewFinanceOverview({ onLogOut, onBack }) {
+  return (
+    <div className="container">
+      <h1>You're all set! 🎉</h1>
+      <p>Here's a quick snapshot of your finances. Let's build your money story together.</p>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '20px',
+          marginTop: '30px',
+        }}
+      >
+        <div className="card card-highlight">
+          <h3>Total Balance</h3>
+          <p style={{ fontSize: '1.5em', fontWeight: 'bold' }}> No imported data </p>
+          <span style={{ color: 'red' }}> No imported data </span>
+        </div>
+
+        <div className="card">
+          <h3>Savings</h3>
+          <p> No imported data </p>
+          <p style={{ fontSize: '0.9em', color: 'gray' }}> No imported data </p>
+        </div>
+
+        <div className="card">
+          <h3>Spending This Month</h3>
+          <p> No imported data </p>
+          <p style={{ fontSize: '0.9em', color: '#f44336' }}> No imported data </p>
+        </div>
+      </div>
+
+      <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'space-between' }}>
+        <button onClick={onBack} className="back-button"> ← Back to Dashboard </button>
+        <button onClick={onLogOut} className="button-primary"> Log Out </button>
+      </div>
+    </div>
+  );
+}
 
 
     function FinanceOverview({ onLogOut, onBack }) {
@@ -111,13 +177,17 @@
     function SignUpPage({ onBack, onSignUpSuccess }) {
       const [newUsername, setNewUsername]= React.useState('');
       const [newPassword, setNewPassword]= React.useState('');
+      const [confirmPassword, setConfirmPassword]= React.useState('');
+      const [error, setError] = React.useState('');
 
       const handleSignUp= () => {
         /* Storing usernames and passwords in memory for the meantime */
-        if(!username.trim() || !password.trim()){
+        if(!newUsername.trim() || !newPassword.trim()){
           setError('Username or password cannot be blank');
-        } else {
-          userDatabase.set(username, password);
+        } else if(confirmPassword !== newPassword){
+          setError('Passwords need to match');
+         } else {
+          userDatabase.set(newUsername, newPassword);
           setError('');
           onSignUpSuccess();
         }
@@ -127,9 +197,9 @@
         <div className="container">
           <h2> sign up </h2>
           <input type="text" placeholder="Username" className="input-field" value= {newUsername} onChange={(e) => setNewUsername(e.target.value)}/>
-          <input type="text" placeholder="Password" className="input-field" value= {newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
-          {error && <p style={{ color: 'red' }}> (error) </p>}
-          <input type="text" placeholder="Confirm Password" className="input-field" />
+          <input type="password" placeholder="Password" className="input-field" value= {newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
+          {error && <p style={{ color: 'red' }}> {error} </p>}
+          <input type="password" placeholder="Confirm Password" className="input-field" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/>
           <button onClick= {handleSignUp} className="button-primary"> Sign Up </button>
           <button onClick={onBack} className="back-button"> ← Back </button>
         </div>
@@ -186,9 +256,13 @@
         case 'sign up':
           return <SignUpPage onBack={() => setPage('accountCheck')} onSignUpSuccess={() => setPage('new dashboard')} />;
         case 'dashboard':
-          return <Dashboard onLogOut={() => setPage('accountCheck')} onContinue={() => setPage('finances')} onPenny={() => setPage('penny')} />
+          return <Dashboard onLogOut={() => setPage('welcome')} onContinue={() => setPage('finances')} onPenny={() => setPage('penny')} />
+        case 'new dashboard': 
+            return <NewDashboard onLogOut={() => setPage('welcome')} onContinue={() => setPage('new finances')} onPenny={() => setPage('penny')} setPage={setPage}/>;
         case 'finances':
           return <FinanceOverview onLogOut={() => setPage('accountCheck')} onBack={() => setPage('dashboard')} />
+        case 'new finances':
+            return <FinanceOverview onLogOut={() => setPage('accountCheck')} onBack={() => setPage('new dashboard')} />
         case 'penny':
           return <PennyAI onClick={() => setPage('penny')} onBack={() => setPage('dashboard')} />
         default:
