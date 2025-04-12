@@ -1,28 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <title>MySavySaver</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>pocketPenny</title>
+</head>
+
+<body>
+  <div id="mydiv"></div>
+  <script type="text/babel">
+    /* Storing usernames and passwords for every run in a map */
+    const userDatabase= new Map();
+    userDatabase.set('nardi', '4432');
+
+    function PennyAI({ onClick, onBack }) {
+      return (
+        <div className="container">
+          <h1> hi! I am Penny, your personal money saver </h1>
+          <div style={{display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap'}}>
+            <button onClick= {onBack} className="back-button"> ← Back </button>
+        </div>
+
+          </div >
+      );
+    }
+
+    function Dashboard({ onLogOut, onContinue, onPenny }) {
+      return (
+        <div className="container">
+          <h1>Welcome to your Dashboard</h1>
+          <p>This is your main hub. Ready to see your finances?</p>
+
+          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+            <button className="button-primary" onClick={onContinue}> Go to Finances </button>
+            <button className="button-primary" onClick={onPenny}> Talk to Penny </button>
+            <button className="button-primary" onClick={onLogOut}> Log Out </button>
+          </div>
+        </div>
+      );
+    }
 
 
-    <div id="mydiv"></div>
+    function FinanceOverview({ onLogOut, onBack }) {
+      return (
+        <div className="container">
+          <h1>here's a quick overview of your finances</h1>
 
-    <script type="text/babel">
-      function Hello() {
-        return <h1>Hello World!</h1>;
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '20px',
+            marginTop: '30px',
+            flexWrap: 'wrap'
+          }}>
+            <div className="card">
+              <h3>Balance</h3>
+              <p>$1,200.00</p>
+            </div>
+            <div className="card">
+              <h3>Savings</h3>
+              <p>$3,400.00</p>
+            </div>
+            <div className="card">
+              <h3>This Month's Spending</h3>
+              <p>$560.00</p>
+            </div>
+
+
+          </div>
+          <button onClick={onBack} className="back-button"> ← Back </button>
+        </div>
+      );
+    }
+
+
+    function LoginPage({ onBack, onLogInSuccess }) {
+      const [username, setUsername] = React.useState('');
+      const [password, setPassword] = React.useState('');
+      const [error, setError] = React.useState('');
+
+      /* Checking for existing accounts or predefined username and password in map for demo login */
+      const handleLogin = () => {
+        if (userDatabase.has(username) && userDatabase.get(username) === password) {
+          setError('');
+          onLogInSuccess();
+        } else { /* Maybe split this into specific invalidity */
+          setError('Invalid username or password')
+        };
       }
 
-      const container = document.getElementById('mydiv');
-      const root = ReactDOM.createRoot(container);
-      root.render(<Hello />)
-    </script>
-    
-</head>
-<body>
-    
+
+      return (
+        <div className="container">
+          <h2> login </h2>
+          <input type="text" placeholder="Username" className="input-field" value={username} onChange={(e) => setUsername(e.target.value)} />
+          <input type="password" placeholder="Password" className="input-field" value={password} onChange={(e) => setPassword(e.target.value)} />
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          <button className="button-primary" onClick={handleLogin}> Login </button>
+          <button onClick={onBack} className="back-button"> ← Back </button>
+        </div>
+      );
+    }
+
+    function SignUpPage({ onBack, onSignUpSuccess }) {
+      const [newUsername, setNewUsername]= React.useState('');
+      const [newPassword, setNewPassword]= React.useState('');
+
+      const handleSignUp= () => {
+        /* Storing usernames and passwords in memory for the meantime */
+        if(!username.trim() || !password.trim()){
+          setError('Username or password cannot be blank');
+        } else {
+          userDatabase.set(username, password);
+          setError('');
+          onSignUpSuccess();
+        }
+      }
+
+      return (
+        <div className="container">
+          <h2> sign up </h2>
+          <input type="text" placeholder="Username" className="input-field" value= {newUsername} onChange={(e) => setNewUsername(e.target.value)}/>
+          <input type="text" placeholder="Password" className="input-field" value= {newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
+          {error && <p style={{ color: 'red' }}> (error) </p>}
+          <input type="text" placeholder="Confirm Password" className="input-field" />
+          <button onClick= {handleSignUp} className="button-primary"> Sign Up </button>
+          <button onClick={onBack} className="back-button"> ← Back </button>
+        </div>
+      );
+    }
+
+    function WelcomePage({ onStart }) {
+      return (
+        <div className="container welcome">
+          <h1>Welcome to pocketPenny</h1>
+          <p> Meet your tiny, mighty money guide, right in your pocket </p>
+          <button className="button-primary" onClick={onStart}>Get Started</button>
+        </div>
+      );
+    }
+
+    function AccountCheckPage({ onLogin, onSignUp, onBack }) {
+      return (
+        <div className="container">
+          <button className="back-button" onClick={onBack}> ← Welcome </button>
+
+          <h2>Do you have an account?</h2>
+          <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
+            <button className="button-primary button-start" onClick={onLogin}>
+              Yes, Log In
+            </button>
+            <button className="button-primary button-start" onClick={onSignUp}>
+              No, Sign Up
+            </button>
+          </div>
+
+        </div>
+      );
+    }
+
+
+
+
+
+    function App() {
+      const [page, setPage] = React.useState('welcome');
+
+      switch (page) {
+        case 'welcome':
+          return <WelcomePage onStart={() => setPage('accountCheck')} />;
+        case 'accountCheck':
+          return <AccountCheckPage
+            onLogin={() => setPage('login')}
+            onSignUp={() => setPage('sign up')}
+            onBack={() => setPage('welcome')}
+          />;
+        case 'login':
+          return <LoginPage onBack={() => setPage('accountCheck')} onLogInSuccess={() => setPage('dashboard')} />;
+        case 'sign up':
+          return <SignUpPage onBack={() => setPage('accountCheck')} onSignUpSuccess={() => setPage('new dashboard')} />;
+        case 'dashboard':
+          return <Dashboard onLogOut={() => setPage('accountCheck')} onContinue={() => setPage('finances')} onPenny={() => setPage('penny')} />
+        case 'finances':
+          return <FinanceOverview onLogOut={() => setPage('accountCheck')} onBack={() => setPage('dashboard')} />
+        case 'penny':
+          return <PennyAI onClick={() => setPage('penny')} onBack={() => setPage('dashboard')} />
+        default:
+          return <WelcomePage onStart={() => setPage('accountCheck')} />;
+      }
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('mydiv'));
+    root.render(<App />);
+  </script>
 </body>
+
 </html>

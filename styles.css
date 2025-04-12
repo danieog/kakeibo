@@ -1,0 +1,136 @@
+body {
+    margin: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    background-color: #f0f4f8;
+    color: #333;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.button-primary {
+    /* Main button format for all login/signup/welcome pages*/
+    padding: 0.5em 1.5em;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: #7e3ff2;
+    /* Purple text */
+    font-size: 13px;
+    position: relative;
+    overflow: hidden;
+    outline: 2px solid #7e3ff2;
+    /* Purple outline */
+    background-color: transparent;
+    z-index: 0;
+    transition: all 300ms ease-in-out;
+}
+
+.button-primary::before {
+    content: "";
+    position: absolute;
+    left: -50px;
+    top: 0;
+    width: 0;
+    height: 100%;
+    background-color: #7e3ff2;
+    transform: skewX(45deg);
+    z-index: -1;
+    transition: width 1000ms ease-in-out;
+}
+
+.button-primary:hover {
+    color: #ffffff;
+    /* White when hovering */
+    transform: scale(1.1);
+    outline: 2px solid #a78bfa;
+    /* Lighter purple outline */
+    box-shadow: 4px 5px 17px -4px #7e3ff2;
+}
+
+.button-primary:hover::before {
+    width: 250%;
+}
+
+.input-field {
+    padding: 10px;
+    margin: 10px 0;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+/* Changed my mind
+.back-button {
+    margin-top: 15px;
+    background: none;
+    border: none;
+    color: #7e3ff2;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.back-button:hover {
+    color: #5b21b6;
+}*/
+
+.card {
+    /* Might use to display bank balances */
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+/* Back button for all pages */
+.back-button { /* Trying to make this go to the upper left corner */
+    position: fixed;
+    top: 20px;    
+    left: 20px;   
+    height: 3em;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #eeeeee4b;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    transition: all 0.2s linear;
+    cursor: pointer;
+    border: none;
+    background: #fff;
+    z-index: 1000; 
+}
+
+
+.back-button>svg {
+    margin-right: 5px;
+    margin-left: 5px;
+    font-size: 20px;
+    transition: all 0.4s ease-in;
+}
+
+.back-button:hover>svg {
+    font-size: 1.2em;
+    transform: translateX(-5px);
+}
+
+.back-button:hover {
+    box-shadow: 9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;
+    transform: translateY(-2px);
+}
