@@ -15,25 +15,42 @@
 <body>
   <div id="mydiv"></div>
   <script type="text/babel">
+    /* Storing usernames and passwords for every run in a map */
+    const userDatabase= new Map();
+    userDatabase.set('nardi', '4432');
 
+    function PennyAI({ onClick, onBack }) {
+      return (
+        <div className="container">
+          <h1> hi! I am Penny, your personal money saver </h1>
+          <div style={{display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap'}}>
+            <button onClick= {onBack} className="back-button"> ← Back </button>
+        </div>
 
+          </div >
+      );
+    }
 
-    function Dashboard({ onLogOut }) {
+    function Dashboard({ onLogOut, onContinue, onPenny }) {
       return (
         <div className="container">
           <h1>Welcome to your Dashboard</h1>
-          <p>This is where your financial overview will appear.</p>
-          <button className="button-primary" onClick={onLogOut}>Logout</button>
+          <p>This is your main hub. Ready to see your finances?</p>
 
+          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+            <button className="button-primary" onClick={onContinue}> Go to Finances </button>
+            <button className="button-primary" onClick={onPenny}> Talk to Penny </button>
+            <button className="button-primary" onClick={onLogOut}> Log Out </button>
+          </div>
         </div>
       );
     }
 
-    function DashboardPage({ onLogOut }) {
+
+    function FinanceOverview({ onLogOut, onBack }) {
       return (
         <div className="container">
-          <h1>welcome to your dashboard</h1>
-          <p>here's a quick overview of your finances</p>
+          <h1>here's a quick overview of your finances</h1>
 
           <div style={{
             display: 'flex',
@@ -55,12 +72,9 @@
               <p>$560.00</p>
             </div>
 
-           
-          </div>
 
-          <button onClick={onLogOut} className="back-button" style={{ marginTop: '40px' }}>
-            Log Out
-          </button>
+          </div>
+          <button onClick={onBack} className="back-button"> ← Back </button>
         </div>
       );
     }
@@ -71,12 +85,9 @@
       const [password, setPassword] = React.useState('');
       const [error, setError] = React.useState('');
 
-      /* Setting a predefined username and password for demo login */
+      /* Checking for existing accounts or predefined username and password in map for demo login */
       const handleLogin = () => {
-        const validUser = {
-          username: 'nardi', password: '4432'
-        };
-        if (username === validUser.username && password === validUser.password) {
+        if (userDatabase.has(username) && userDatabase.get(username) === password) {
           setError('');
           onLogInSuccess();
         } else { /* Maybe split this into specific invalidity */
@@ -92,19 +103,35 @@
           <input type="password" placeholder="Password" className="input-field" value={password} onChange={(e) => setPassword(e.target.value)} />
           {error && <p style={{ color: 'red' }}>{error}</p>}
           <button className="button-primary" onClick={handleLogin}> Login </button>
-          <button onClick={onBack} className="back-button"> Back to Login/Sign Up </button>
+          <button onClick={onBack} className="back-button"> ← Back </button>
         </div>
       );
     }
 
-    function SignUpPage({ onBack }) {
+    function SignUpPage({ onBack, onSignUpSuccess }) {
+      const [newUsername, setNewUsername]= React.useState('');
+      const [newPassword, setNewPassword]= React.useState('');
+
+      const handleSignUp= () => {
+        /* Storing usernames and passwords in memory for the meantime */
+        if(!username.trim() || !password.trim()){
+          setError('Username or password cannot be blank');
+        } else {
+          userDatabase.set(username, password);
+          setError('');
+          onSignUpSuccess();
+        }
+      }
+
       return (
         <div className="container">
           <h2> sign up </h2>
-          <input type="text" placeholder="Username" className="input-field" />
-          <input type="text" placeholder="Password" className="input-field" />
-          <button className="button-primary"> Sign In </button>
-          <button onClick={onBack} className="back-button"> Back to Login/Sign Up </button>
+          <input type="text" placeholder="Username" className="input-field" value= {newUsername} onChange={(e) => setNewUsername(e.target.value)}/>
+          <input type="text" placeholder="Password" className="input-field" value= {newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
+          {error && <p style={{ color: 'red' }}> (error) </p>}
+          <input type="text" placeholder="Confirm Password" className="input-field" />
+          <button onClick= {handleSignUp} className="button-primary"> Sign Up </button>
+          <button onClick={onBack} className="back-button"> ← Back </button>
         </div>
       );
     }
@@ -122,6 +149,8 @@
     function AccountCheckPage({ onLogin, onSignUp, onBack }) {
       return (
         <div className="container">
+          <button className="back-button" onClick={onBack}> ← Welcome </button>
+
           <h2>Do you have an account?</h2>
           <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
             <button className="button-primary button-start" onClick={onLogin}>
@@ -131,7 +160,7 @@
               No, Sign Up
             </button>
           </div>
-          <button className="back-button" onClick={onBack}>Back to Welcome</button>
+
         </div>
       );
     }
@@ -149,15 +178,19 @@
         case 'accountCheck':
           return <AccountCheckPage
             onLogin={() => setPage('login')}
-            onSignUp={() => alert('Sign-up page coming soon!')}
+            onSignUp={() => setPage('sign up')}
             onBack={() => setPage('welcome')}
           />;
         case 'login':
           return <LoginPage onBack={() => setPage('accountCheck')} onLogInSuccess={() => setPage('dashboard')} />;
         case 'sign up':
-          return <SignUpPage onBack={() => setPage('accountCheck')} />;
+          return <SignUpPage onBack={() => setPage('accountCheck')} onSignUpSuccess={() => setPage('new dashboard')} />;
         case 'dashboard':
-          return <DashboardPage onLogOut={() => setPage('accountCheck')} />
+          return <Dashboard onLogOut={() => setPage('accountCheck')} onContinue={() => setPage('finances')} onPenny={() => setPage('penny')} />
+        case 'finances':
+          return <FinanceOverview onLogOut={() => setPage('accountCheck')} onBack={() => setPage('dashboard')} />
+        case 'penny':
+          return <PennyAI onClick={() => setPage('penny')} onBack={() => setPage('dashboard')} />
         default:
           return <WelcomePage onStart={() => setPage('accountCheck')} />;
       }
