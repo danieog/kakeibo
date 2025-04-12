@@ -1,11 +1,12 @@
+import React from "react";
 
-function App() {
-
+const App = () => {
   return (
-    <h1 class="text-3xl font-bold underline">
-    Hello world!
-  </h1>
-  )
-}
+    <div className="max-w-screen-lg mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+      <div className="w-full max-w-lg bg-white shadow-lg rounded-lg overflow-hidden">
+        
+      </div>
+  );
+};
 
-export default App
+export default App;
