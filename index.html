@@ -6,23 +6,52 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <title>MySavySaver</title>
+    <title>Kakeibo</title>
 
 
     <div id="mydiv"></div>
-
-    <script type="text/babel">
-      function Hello() {
-        return <h1>Hello World!</h1>;
-      }
-
-      const container = document.getElementById('mydiv');
-      const root = ReactDOM.createRoot(container);
-      root.render(<Hello />)
-    </script>
-    
 </head>
 <body>
-    
+
+  //Welcome page
+  <script type="text/babel">
+  function WelcomePage() {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100vh', 
+        fontFamily: 'Arial, sans-serif', 
+        backgroundColor: '#f0f4f8', //ca08f9 is the purple we like, might implement
+        color: '#333'
+      }}>
+
+      <h1>Welcome to Kakeibo!</h1>
+        <p>Your smart partner in saving better and spending wisely.</p>
+        <button style={{ 
+          marginTop: '20px', 
+          padding: '10px 20px', 
+          backgroundColor: '#4CAF50', 
+          color: 'white', 
+          border: 'none', 
+          borderRadius: '5px', 
+          cursor: 'pointer' 
+        }}
+        onClick={() => alert('Let’s get started!')}>
+          Get Started
+        </button>
+      </div>
+    );
+  }
+
+  const container = document.getElementById('mydiv');
+  const root = ReactDOM.createRoot(container);
+  root.render(<WelcomePage />);
+</script>
+
+
+
 </body>
 </html>
