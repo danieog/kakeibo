@@ -16,28 +16,44 @@
   <div id="mydiv"></div>
   <script type="text/babel">
     /* Storing usernames and passwords for every run in a map */
-    const userDatabase= new Map();
+    const userDatabase = new Map();
     userDatabase.set('nardi', '4432');
 
     function PennyAI({ onClick, onBack }) {
       return (
         <div className="container">
           <h1> hi! I am Penny, your personal money saver </h1>
-          <div style={{display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap'}}>
-            <button onClick= {onBack} className="back-button"> ← Back </button>
-        </div>
+          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+            <button onClick={onBack} className="back-button"> ← Back </button>
+          </div>
 
-          </div >
+        </div >
       );
     }
 
-    function Dashboard({ onLogOut, onContinue, onPenny }) {
+    function NewDashboard({ onLogOut, onContinue, onPenny, setPage }) {
+      return (
+        <div className="container">
+          <h1>Welcome to your Dashboard</h1>
+          <p>Let's get you started. First step is to connect an account</p>
+
+          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+            <button className="button-primary" onClick={() => setPage('connect an account')}> Connect a banking account </button>
+            <button className="button-primary" onClick={onPenny}> Talk to Penny </button>
+            <button className="button-primary" onClick={onLogOut}> Log Out </button>
+          </div>
+        </div>
+      );
+    }
+
+    function Dashboard({ onLogOut, onContinue, onPenny, setPage }) {
       return (
         <div className="container">
           <h1>Welcome to your Dashboard</h1>
           <p>This is your main hub. Ready to see your finances?</p>
 
           <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+            <button className="button-primary" onClick={() => setPage('connect an account')}> Connect a banking account </button>
             <button className="button-primary" onClick={onContinue}> Go to Finances </button>
             <button className="button-primary" onClick={onPenny}> Talk to Penny </button>
             <button className="button-primary" onClick={onLogOut}> Log Out </button>
@@ -45,6 +61,29 @@
         </div>
       );
     }
+
+    function ConnectAnAccount({ onBack, onLogOut }) {
+      return (
+        <div className="container">
+          <h1>Securely connect a banking account</h1>
+          <p>We use <strong>Plaid</strong> to securely link your financial accounts. Your information is encrypted and never shared without your consent.</p>
+
+          <div style={{ marginTop: '30px' }}>
+            {/* This button will launch Plaid Link */}
+            <button className="button-primary">
+              Connect with Plaid
+            </button>
+          </div>
+
+          <div style={{ marginTop: '30px', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+            <button className="back-button" onClick={onBack}> ← Back </button>
+            <button className="button-primary" onClick={onLogOut}> Log Out </button>
+          </div>
+        </div>
+      );
+    }
+
+
 
 
     function FinanceOverview({ onLogOut, onBack }) {
@@ -109,15 +148,19 @@
     }
 
     function SignUpPage({ onBack, onSignUpSuccess }) {
-      const [newUsername, setNewUsername]= React.useState('');
-      const [newPassword, setNewPassword]= React.useState('');
+      const [newUsername, setNewUsername] = React.useState('');
+      const [newPassword, setNewPassword] = React.useState('');
+      const [confirmPassword, setConfirmPassword] = React.useState('');
+      const [error, setError] = React.useState('');
 
-      const handleSignUp= () => {
+      const handleSignUp = () => {
         /* Storing usernames and passwords in memory for the meantime */
-        if(!username.trim() || !password.trim()){
+        if (!newUsername.trim() || !newPassword.trim()) {
           setError('Username or password cannot be blank');
+        } else if (confirmPassword !== newPassword) {
+          setError('Passwords need to match');
         } else {
-          userDatabase.set(username, password);
+          userDatabase.set(newUsername, newPassword);
           setError('');
           onSignUpSuccess();
         }
@@ -126,11 +169,11 @@
       return (
         <div className="container">
           <h2> sign up </h2>
-          <input type="text" placeholder="Username" className="input-field" value= {newUsername} onChange={(e) => setNewUsername(e.target.value)}/>
-          <input type="text" placeholder="Password" className="input-field" value= {newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
-          {error && <p style={{ color: 'red' }}> (error) </p>}
-          <input type="text" placeholder="Confirm Password" className="input-field" />
-          <button onClick= {handleSignUp} className="button-primary"> Sign Up </button>
+          <input type="text" placeholder="Username" className="input-field" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} />
+          <input type="password" placeholder="Password" className="input-field" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <input type="password" placeholder="Confirm Password" className="input-field" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+          {error && <p style={{ color: 'red' }}> {error} </p>}
+          <button onClick={handleSignUp} className="button-primary"> Sign Up </button>
           <button onClick={onBack} className="back-button"> ← Back </button>
         </div>
       );
@@ -186,11 +229,15 @@
         case 'sign up':
           return <SignUpPage onBack={() => setPage('accountCheck')} onSignUpSuccess={() => setPage('new dashboard')} />;
         case 'dashboard':
-          return <Dashboard onLogOut={() => setPage('accountCheck')} onContinue={() => setPage('finances')} onPenny={() => setPage('penny')} />
+          return <Dashboard onLogOut={() => setPage('welcome')} onContinue={() => setPage('finances')} onPenny={() => setPage('penny')} setPage={setPage} />
+        case 'new dashboard':
+          return <NewDashboard onLogOut={() => setPage('welcome')} onContinue={() => setPage('new finances')} onPenny={() => setPage('penny')} setPage={setPage} />;
         case 'finances':
           return <FinanceOverview onLogOut={() => setPage('accountCheck')} onBack={() => setPage('dashboard')} />
         case 'penny':
           return <PennyAI onClick={() => setPage('penny')} onBack={() => setPage('dashboard')} />
+        case 'connect an account':
+          return <ConnectAnAccount onBack={() => setPage('new dashboard')} onLogOut={() => setPage('welcome')} />
         default:
           return <WelcomePage onStart={() => setPage('accountCheck')} />;
       }
