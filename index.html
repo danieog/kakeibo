@@ -171,8 +171,8 @@
           <h2> sign up </h2>
           <input type="text" placeholder="Username" className="input-field" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} />
           <input type="password" placeholder="Password" className="input-field" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-          {error && <p style={{ color: 'red' }}> {error} </p>}
           <input type="password" placeholder="Confirm Password" className="input-field" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+          {error && <p style={{ color: 'red' }}> {error} </p>}
           <button onClick={handleSignUp} className="button-primary"> Sign Up </button>
           <button onClick={onBack} className="back-button"> ← Back </button>
         </div>
