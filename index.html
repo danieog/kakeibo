@@ -57,7 +57,8 @@
             },
           body: JSON.stringify({ message: userMessage }),
           });
-
+          console.log("Response from backend:", response);
+          
           const data = await response.json();
           const botMessage = data.response || "Sorry, I couldn't understand that.";
 
