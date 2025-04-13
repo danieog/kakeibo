@@ -33,16 +33,73 @@
     };
 
     function PennyAI({ onClick, onBack }) {
+      const [showChat, setShowChat] = React.useState(false);
+
       return (
-        <div className="container">
-          <h1> hi! I am Penny, your personal money saver </h1>
-          <div className="button-container">
-            <button onClick={onBack} className="back-button"> ← Back </button>
+        <>
+          <div className="container">
+            <h1 style={{ marginBottom: '1rem' }}>
+              hi! I am Penny, your personal money saver 🪙
+            </h1>
+            <h2 style={{ marginBottom: '1rem' }}>
+              Tell me what you're thinking of buying and I'll tell you if your budget allows for it
+            </h2>
+            <button className="button-primary" onClick={() => setShowChat(true)}>
+              Start Chat
+            </button>
           </div>
 
-        </div >
+          {showChat && (
+            <>
+              <div className="modal-shade" onClick={() => setShowChat(false)}></div>
+              <div className="penny-container">
+                <div id="chatbot" className="chatbot-popup visible">
+                  <div className="chat-header">
+                    <div className="header-info">
+                      <h2 className="logo-text">🪙 penny the pincher</h2>
+                    </div>
+                    <button className="material-symbols-rounded" aria-label="Minimize chat" onClick={() => setShowChat(false)}> x </button>
+                  </div>
+
+                  <div className="chat-body">
+                    <div className="message bot-message">
+                      <p className="message-text">
+                        hello! i am penny, your personal finance assistant. how can i help you today?
+                      </p>
+                    </div>
+                  </div>
+
+                  {/*
+                     <iframe src="https://your-deployed-link.com" title="Penny AI" style={{
+                        width: '100%',
+                        height: '400px',
+                        border: '2px solid #7e3ff2',
+                        borderRadius: '10px',
+                        boxShadow: '0 0 15px rgba(0,0,0,0.1)',
+                      }}/>
+                    */}
+                  {/*start*/}
+                  <div className="chat-footer">
+                    <form className="chat-form">
+                      <input
+                        type="text"
+                        className="message-input"
+                        placeholder="Type your message..."
+                        required
+                      />
+                      <button type="submit" className="button-primary">
+                        Send
+                      </button>
+                    </form>
+                  </div> {/*end*/}
+                </div>
+              </div>
+            </>
+          )}
+        </>
       );
     }
+
 
     function NewDashboard({ onLogOut, onContinue, onPenny, setPage, loggedInUser }) {
       return (
@@ -148,7 +205,7 @@
             <label>
               Category:
               <select name="category" value={expenseData.category} onChange={handleChange} required>
-                <option value="" disabled>Select category</option>
+                <option value="" disabled> Select category </option>
                 <option value="food">Food</option>
                 <option value="rent">Rent</option>
                 <option value="transportation">Transportation</option>
@@ -161,7 +218,7 @@
 
             <label>
               Amount:
-              <input type="number" name="amount" value={expenseData.amount} onChange={handleChange} />
+              <input type="number" name="amount" value={expenseData.amount} onChange={handleChange} required />
             </label>
 
             <button type="submit" className="button-primary">Add Expense</button>
@@ -553,6 +610,11 @@
       };
 
       const handleAddExpense = (expenseData) => {
+        if (!expenseData.category || isNaN(parseFloat(expenseData.amount))) {
+          alert("Please enter a valid category and amount.");
+          return;
+        }
+
         setBudgetData((prevData) => {
           const updatedCategories = { ...prevData.categories };
           updatedCategories[expenseData.category].spent += parseFloat(expenseData.amount);
