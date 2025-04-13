@@ -47,7 +47,7 @@
     function NewDashboard({ onLogOut, onContinue, onPenny, setPage, loggedInUser }) {
       return (
         <div className="container">
-          <h1>Hi, {loggedInUser} 👋 Welcome to your Dashboard</h1>
+          <h1>Hi, {loggedInUser} 👋! Welcome to your Dashboard</h1>
           <p>Let's get you started. First step is to connect an account</p>
 
           <div className="button-container">
@@ -62,7 +62,7 @@
     function Dashboard({ onLogOut, onContinue, onPenny, setPage, loggedInUser }) {
       return (
         <div className="container">
-          <h1>Hi, {loggedInUser} 👋 Welcome to your Dashboard</h1>
+          <h1>Hi, {loggedInUser} 👋! Welcome to your Dashboard</h1>
           <p>This is your main hub. Ready to see your finances?</p>
 
           <div className="button-container">
@@ -431,9 +431,11 @@
       const handleLogin = () => {
         if (username === "nardi" && password === "4432") {
           setError('');
+          fromNewUser = false;
           onLogInSuccess("nardi"); // special demo user
         } else if (userDatabase.has(username) && userDatabase.get(username) === password) {
           setError('');
+          fromNewUser = false;
           onLogInSuccess(username);
         } else {
           setError('Invalid username or password');
@@ -609,9 +611,13 @@
           return loggedInUser === "nardi"
             ? <FinanceOverview onBack={() => setPage('dashboard')} onLogOut={() => setPage('welcome')} />
             : <BudgetOverview budgetData={budgetData} />;
-
         case 'penny':
-          return <PennyAI onClick={() => setPage('penny')} onBack={() => setPage('dashboard')} />;
+          return (<PennyAI
+            onClick={() => setPage('penny')}
+            onBack={() => setPage(fromNewUser ? 'new dashboard' : 'dashboard')}
+          />
+          );
+
         case 'connect an account':
           return (<ConnectAnAccount onBack={() => setPage(fromNewUser ? 'new dashboard' : 'dashboard')} onLogOut={() => {
             setLoggedInUser(null);
