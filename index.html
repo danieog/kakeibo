@@ -35,7 +35,7 @@
       return (
         <div className="container">
           <h1> hi! I am Penny, your personal money saver </h1>
-          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+          <div className="button-container">
             <button onClick={onBack} className="back-button"> ← Back </button>
           </div>
 
@@ -49,7 +49,7 @@
           <h1>Welcome to your Dashboard</h1>
           <p>Let's get you started. First step is to connect an account</p>
 
-          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+          <div className="button-container">
             <button className="button-primary" onClick={() => setPage('connect an account')}> Connect a banking account </button>
             <button className="button-primary" onClick={onPenny}> Talk to Penny </button>
             <button className="button-primary" onClick={onLogOut}> Log Out </button>
@@ -64,7 +64,7 @@
           <h1>Welcome to your Dashboard</h1>
           <p>This is your main hub. Ready to see your finances?</p>
 
-          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+          <div className="button-container">
             <button className="button-primary" onClick={() => setPage('connect an account')}> Connect a banking account </button>
             <button className="button-primary" onClick={onContinue}> Go to Finances </button>
 
@@ -369,7 +369,7 @@
         credit: 560,
       };
 
-      const totalBalance = balances.checking + balances.savings + balances.credit;
+      const totalBalance = balances.checking + balances.savings - balances.credit;
 
       return (
         <div className="container">
@@ -410,7 +410,7 @@
                 </div>
                 <div className="card">
                   <h3>Credit Card Balance</h3>
-                  <p>${balances.credit.toFixed(2)}</p>
+                  <p style={{ color: 'red' }}>-${balances.credit.toFixed(2)}</p>
                 </div>
               </>
             )}
@@ -444,7 +444,7 @@
 
       return (
         <div className="container">
-          <h2> login </h2>
+          <h2> Login </h2>
           <input type="text" placeholder="Username" className="input-field" value={username} onChange={(e) => setUsername(e.target.value)} />
           <input type="password" placeholder="Password" className="input-field" value={password} onChange={(e) => setPassword(e.target.value)} />
           {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -475,7 +475,7 @@
 
       return (
         <div className="container">
-          <h2> sign up </h2>
+          <h2> Sign up </h2>
           <input type="text" placeholder="Username" className="input-field" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} />
           <input type="password" placeholder="Password" className="input-field" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
           <input type="password" placeholder="Confirm Password" className="input-field" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />

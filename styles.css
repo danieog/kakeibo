@@ -14,6 +14,16 @@ body {
     text-align: center;
 }
 
+.button-container {
+    display: flex;
+    justify-content: center; /* centers horizontally */
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+
 .button-primary {
     /* Main button format for all login/signup/welcome pages*/
     padding: 0.5em 1.5em;
