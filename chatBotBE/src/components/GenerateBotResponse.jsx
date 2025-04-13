@@ -1,36 +1,69 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 // Initialize the API with your key
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_KEY });
 
 export async function GenerateBotResponse(messages) {
   try {
-    console.log("Processing messages for Gemini:", messages);
+    console.log("Messages array:", messages);
     
-    // Format messages for the API
-    const formattedMessages = messages.map(message => ({
-      role: message.role,
-      parts: [{ text: message.parts }]
-    }));
+    // Check if messages array is empty
+    if (!messages || messages.length === 0) {
+      console.log("Messages array is empty");
+      return "No messages to respond to. Please send a message.";
+    }
     
-    console.log("Formatted messages:", formattedMessages);
+    // Get the last message (assuming it's from the user)
+    const lastMessage = messages[messages.length - 1];
+    console.log("Last message:", lastMessage);
     
-    // Generate content
-    const result = await genAI.generateContent({
-      model: "models/gemini-2.0", // Correct model name if "gemini-2.0-flash" is invalid
-      prompt: formattedMessages.map(msg => msg.parts[0].text).join("\n"),
-      maxOutputTokens: 2048, // Adjusted parameter placement if required by the library
+    // Extract text content from the message
+    let userInput = "";
+    
+    if (lastMessage && typeof lastMessage === 'object') {
+      // If it's an object with a parts property
+      if (lastMessage.parts !== undefined) {
+        userInput = String(lastMessage.parts);
+      } 
+      // If it's an object with a content property
+      else if (lastMessage.content !== undefined) {
+        userInput = String(lastMessage.content);
+      }
+      // If it's an object with a text property  
+      else if (lastMessage.text !== undefined) {
+        userInput = String(lastMessage.text);
+      }
+      // If it has a message property
+      else if (lastMessage.message !== undefined) {
+        userInput = String(lastMessage.message);
+      }
+    } else if (typeof lastMessage === 'string') {
+      // If the message is directly a string
+      userInput = lastMessage;
+    }
+    
+    console.log("Extracted user input:", userInput);
+    
+    // If we couldn't extract any text, use a fallback
+    if (!userInput || userInput.trim() === "") {
+      console.log("No valid input extracted");
+      return "I couldn't understand your message. Please try again.";
+    }
+    
+    // Generate content with the extracted text
+    const result = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: userInput
     });
     
-    // Extract text from response
-    const text = result.candidates[0]?.content || "No response generated.";
+    const text = result.text || "No response generated.";
     
     console.log("Response from Gemini:", text);
     return text;
     
   } catch (error) {
     console.error("Error calling Gemini API:", error);
-    throw error;
+    return "Sorry, I encountered an error processing your request.";
   }
 }
 
