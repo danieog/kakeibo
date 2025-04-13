@@ -547,7 +547,16 @@
 
     function WelcomePage({ onStart }) {
       return (
-        <div className="container welcome">
+        <div
+          className="container welcome"
+          style={{
+            display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', flexDirection: 'column', textAlign: 'center'
+          }}
+        >
+          <img src="https://github.com/danieog/kakeibo/blob/main/images/welcome.png?raw=true" alt="Welcome Logo"
+            style={{
+              width: '100%', height: 'auto', maxWidth: '800px', marginBottom: '10px'
+            }} />
           <h1>Welcome to pocketPenny</h1>
           <p>Meet your tiny, mighty money guide, right in your pocket</p>
           <button className="button-primary" onClick={onStart}>Get Started</button>
@@ -583,6 +592,10 @@
     function App() {
       const [page, setPage] = React.useState('welcome');
       const [loggedInUser, setLoggedInUser] = React.useState(null);
+
+      const getBodyClass = () => {
+        return page === 'welcome' ? 'welcome-page' : 'default-page';
+      };
 
       const [budgetData, setBudgetData] = React.useState({
         income: 0,
@@ -706,6 +719,15 @@
         default:
           return <div>Page Not Found</div>;
       }
+      return (
+        <div className={getBodyClass()}>
+          {page === 'welcome' ? (
+            <WelcomePage onStart={() => setPage('accountCheck')} />
+          ) : (
+            <Dashboard />
+          )}
+        </div>
+      );
     }
 
     const root = ReactDOM.createRoot(document.getElementById('mydiv'));
