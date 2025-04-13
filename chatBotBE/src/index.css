@@ -15,22 +15,167 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background-color: #f5f2f8
+    background-color: #f5f2f8;
 }
 
 .chatbot-popup {
     background: #fff;
-    width: 400px;
+    width: 420px;
     overflow: hidden;
-    height: 600px;
-    border-radius: 25px;
+    position: relative;
+    border-radius: 15px;
     box-shadow: 0 0 20px #c0b9c7;
 }
 
-.chat-header {
+.chatbot-popup .chat-header {
+    display: flex;
+    padding: 10px 10px;
+    align-items: center;
+    justify-content: space-between;
+    background: rgb(135, 63, 165) ;
+}
 
+.chat-header .header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-header button {
+    /* Link this to the main banking page */
+    border: none;
+    color: #fff;
+    padding-top: 5px;
+    background: none;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+    position: relative;
+}
+
+.chat-header button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ddd;
+}
+
+.chat-header button::after {
+    content: "back to main";
+    position: absolute;
+    top: 35px;
+    left: 50%;
+    transform: translateX(-100%);
+    background: #8F06B1;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-family: "Nunito Sans", sans-serif;
+    text-transform: lowercase;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.chat-header button:hover::after {
+    opacity: 1;
+    background: #6A0488;
+}
+
+.header-info .logo-text {
+    font-size: 20px;
+    font-weight: 60;
+    color: #fff;
+    margin-left: 10px;
 }
 
 .chat-body{
+    padding: 25px 22px;
+    height: 460px;
+    overflow-y: auto;
+    display: flex;
+    margin-bottom: 20px;
+    flex-direction: column;
+    gap: 10px;
+    background: #fff;
+}
 
+.chat-body .message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-body .message .message-text {
+    padding: 10px 15px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.chat-body .bot-message .message-text {
+    background: #eee;
+    border-radius: 10px 10px 10px 0px;
+    color: #1F1E20;
+}
+
+.chat-body .user-message {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.chat-body .user-message .message-text {
+    background: #8F06B1;
+    border-radius: 10px 10px 0 10px;
+    color: #F5F2F8;
+}
+
+.chat-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: #fff;
+    padding: 15px 22px 20px;
+}
+
+.chat-footer .chat-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    outline: 1px solid #eee;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #eee;
+}
+
+.chat-footer .chat-form:focus-within {
+    outline: 2px solid #8F06B1;
+}
+
+.chat-footer .message-input {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: #fff;
+    font-size: 16px;
+}
+
+.chat-form button {
+    border: none;
+    background: #8F06B1;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s ease;
+}
+
+.chat-form button:hover {
+    background: #6A0488;
+}
+
+.chat-form .message-input:valid~button {
+    display: block;
 }
