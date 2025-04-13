@@ -1,42 +1,47 @@
+import ChatForm from "./components/ChatForm";
+import React, { useState } from "react";
+import ChatMessage from "./components/ChatMessage"; // Import ChatMessage component
 
 const App = () => {
-  return <div className="container">
-    <div className="chatbot-popup">
-      {/* Header */}
-      <div className="chat-header">
-        <div className="header-info">
-          <h2 className="logo-text">🪙 penny pincher </h2>
-        </div>
-          <button className="material-symbols-rounded">
+  const [chatHistory, setChatHistory] = useState([]); // State to store chat history
+
+  return (
+    <div className="container">
+      <div className="chatbot-popup">
+        {/* Header */}
+        <div className="chat-header">
+          <div className="header-info">
+            <h2 className="logo-text"> 🪙 penny the pincher </h2>
+          </div>
+          <button
+            className="material-symbols-rounded"
+            aria-label="Minimize chat"
+          >
             keyboard_arrow_down
           </button>
-      </div>
-      {/* Body */}
-      <div className="chat-body">
-        {/* Bot Message */}
-        <div className="message bot-message">
-          <p className="message-text"> hello! i am penny pincher, your personal finance assistant. how can i help you today?</p>
+        </div>
+        {/* Body */}
+        <div className="chat-body">
+          {/* Bot Message */}
+          <div className="message bot-message">
+            <p className="message-text">
+              hello! i am penny, your personal finance assistant. how can i help
+              you today?
+            </p>
+          </div>
+
+          {chatHistory.map((message, index) => (
+            <ChatMessage key={index} message={message} />
+          ))}
         </div>
 
-        {/* User Message */}
-        <div className="message user-message">
-          <p className="message-text"> ask penny about anything finance related</p>
+        {/* Footer */}
+        <div className="chat-footer">
+          <ChatForm setChatHistory={setChatHistory} />
         </div>
-      </div>
-      
-      {/* Footer */}
-      <div className="chat-footer">
-        <form action="#" className="chat-form">
-          <input type="text" placeholder="type your message here" 
-          className="message-input" required />
-          <button className="material-symbols-rounded">
-            keyboard_arrow_up
-          </button>
-        </form>
       </div>
     </div>
-  </div>
-  
-}
+  );
+};
 
-export default App
+export default App;
