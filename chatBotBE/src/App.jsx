@@ -1,9 +1,30 @@
 import ChatForm from "./components/ChatForm";
 import React, { useState } from "react";
-import ChatMessage from "./components/ChatMessage"; // Import ChatMessage component
+import ChatMessage from "./components/ChatMessage";
 
 const App = () => {
   const [chatHistory, setChatHistory] = useState([]); // State to store chat history
+
+  const generateBotResponse = async (history) => {
+    history = history.map(({ sender, text }) => 
+      ({ sender, parts: [text] }));
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: history}),
+    }
+
+    try {
+      const response = await fetch(import.meta.env.VITE_API_URL, requestOptions);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Something went wrong");
+        
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="container">
@@ -20,9 +41,9 @@ const App = () => {
             keyboard_arrow_down
           </button>
         </div>
+
         {/* Body */}
         <div className="chat-body">
-          {/* Bot Message */}
           <div className="message bot-message">
             <p className="message-text">
               hello! i am penny, your personal finance assistant. how can i help
@@ -37,7 +58,11 @@ const App = () => {
 
         {/* Footer */}
         <div className="chat-footer">
-          <ChatForm setChatHistory={setChatHistory} />
+          <ChatForm
+            chatHistory={chatHistory}
+            setChatHistory={setChatHistory}
+            generateBotResponse={generateBotResponse}
+          />
         </div>
       </div>
     </div>

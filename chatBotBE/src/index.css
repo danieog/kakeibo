@@ -98,6 +98,9 @@ body {
     flex-direction: column;
     gap: 10px;
     background: #fff;
+    scrollbar-width: thin;
+    scrollbar-color: #e9dff4 transparent;
+    
 }
 
 .chat-body .message {
@@ -134,7 +137,6 @@ body {
     bottom: 0;
     width: 100%;
     background: #fff;
-    padding: 15px 22px 20px;
 }
 
 .chat-footer .chat-form {
@@ -143,7 +145,6 @@ body {
     gap: 10px;
     outline: 1px solid #eee;
     background: #fff;
-    border-radius: 10px;
     box-shadow: 0 0 10px #eee;
 }
 
