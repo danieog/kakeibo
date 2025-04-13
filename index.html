@@ -50,12 +50,12 @@
 
         // Send the message to the backend API
         try {
-          const response = await fetch('http://localhost:5000/chat', {
+          const response = await fetch('http://localhost:5173/', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message: userMessage }),
+          body: JSON.stringify({ message: userMessage }),
           });
 
           const data = await response.json();
