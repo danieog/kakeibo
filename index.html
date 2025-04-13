@@ -19,6 +19,7 @@
     /* Storing usernames and passwords for every run in a map */
     const userDatabase = new Map();
     userDatabase.set('nardi', '4432');
+    let fromNewUser = false;
     const userBudget = {
       income: 0, // total income
       categories: {
@@ -43,10 +44,10 @@
       );
     }
 
-    function NewDashboard({ onLogOut, onContinue, onPenny, setPage }) {
+    function NewDashboard({ onLogOut, onContinue, onPenny, setPage, loggedInUser }) {
       return (
         <div className="container">
-          <h1>Welcome to your Dashboard</h1>
+          <h1>Hi, {loggedInUser} 👋 Welcome to your Dashboard</h1>
           <p>Let's get you started. First step is to connect an account</p>
 
           <div className="button-container">
@@ -61,7 +62,7 @@
     function Dashboard({ onLogOut, onContinue, onPenny, setPage, loggedInUser }) {
       return (
         <div className="container">
-          <h1>Welcome to your Dashboard</h1>
+          <h1>Hi, {loggedInUser} 👋 Welcome to your Dashboard</h1>
           <p>This is your main hub. Ready to see your finances?</p>
 
           <div className="button-container">
@@ -76,7 +77,10 @@
             )}
 
             <button className="button-primary" onClick={onPenny}> Talk to Penny </button>
-            <button className="button-primary" onClick={onLogOut}> Log Out </button>
+            <button className="button-primary" onClick={() => {
+              fromNewUser = false;
+              onLogOut();
+            }} > Log Out </button>
           </div>
         </div>
       );
@@ -190,24 +194,22 @@
       return (
         <div className="container" style={{ alignItems: 'stretch', padding: '2rem' }}>
           <button onClick={onBack} className="back-button">← Back</button>
-          <h2 style={{ marginBottom: '1.5rem', fontSize: '2rem' }}>
-            Here's your monthly budget, Nardi 🎓
-          </h2>
 
-          <div className="card" style={{ margin: '0 auto 2rem auto', width: 'fit-content' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <p><br></br></p>
+            <p><br></br></p>
+            <p><br></br></p>
+            <h2 style={{ marginBottom: '0.5rem', fontSize: '2rem' }}>
+              Here's your monthly budget, Nardi 🎓
+            </h2>
             <h3>Total Income</h3>
             <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#7e3ff2' }}>
               ${demoBudgetData.income}
             </p>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-              gap: '1.5rem',
-            }}
-          >
+          <div className="centered-card-container" style={{ margin: '0.5rem auto 2rem auto', width: 'fit-content' }}>
+
             {Object.keys(demoBudgetData.categories).map((category) => {
               const data = demoBudgetData.categories[category];
               const remaining = data.budget - data.spent;
@@ -255,7 +257,7 @@
     function BudgetOverview({ budgetData }) {
       return (
         <div className="container" style={{ alignItems: 'stretch', padding: '2rem' }}>
-          <h2 style={{ marginBottom: '1.5rem', fontSize: '2rem' }}>
+          <h2 style={{ marginBottom: '0.5rem', fontSize: '2rem' }}>
             Here's your monthly budget, {username}
           </h2>
 
@@ -320,8 +322,8 @@
 
 
 
-    function ConnectAnAccount({ onBack, onLogOut }) {
-      const SANDBOX_LINK_TOKEN = "4673f86ae69a1359a337c15cd65448"; // Sandbox key for demo purposes
+    function ConnectAnAccount({ onBack, onLogOut, setPage }) {
+      const SANDBOX_LINK_TOKEN = "4673f86ae69a1359a337c15cd65448"; // Sandbox key for demo
 
       const launchPlaid = () => {
         const handler = window.Plaid.create({
@@ -353,12 +355,15 @@
           </div>
 
           <div style={{ marginTop: "30px", display: "flex", gap: "20px", flexWrap: "wrap" }}>
-            <button className="back-button" onClick={onBack}> ← Back </button>
+            <button className="back-button" onClick={() => {
+              setPage(fromNewUser ? 'new dashboard' : 'dashboard');
+            }}>
+              ← Back
+            </button>
           </div>
         </div>
       );
     }
-
 
     function FinanceOverview({ onBack }) {
       const [combineAccounts, setCombineAccounts] = React.useState(true);
@@ -373,6 +378,9 @@
 
       return (
         <div className="container">
+          <p><br></br></p>
+          <p><br></br></p>
+          <p><br></br></p>
           <h1>Here's a quick overview of your finances</h1>
 
           <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -384,15 +392,7 @@
             />
           </div>
 
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '20px',
-              marginTop: '30px',
-              flexWrap: 'wrap',
-            }}
-          >
+          <div className="centered-card-container" style={{ marginTop: '0.5rem' }}>
             {combineAccounts ? (
               <div className="card">
                 <h3>Total Balance</h3>
@@ -469,7 +469,8 @@
         } else {
           userDatabase.set(newUsername, newPassword);
           setError('');
-          onSignUpSuccess();
+          onSignUpSuccess(newUsername);
+          fromNewUser = true;
         }
       }
 
@@ -490,11 +491,13 @@
       return (
         <div className="container welcome">
           <h1>Welcome to pocketPenny</h1>
-          <p> Meet your tiny, mighty money guide, right in your pocket </p>
+          <p>Meet your tiny, mighty money guide, right in your pocket</p>
           <button className="button-primary" onClick={onStart}>Get Started</button>
         </div>
       );
     }
+
+
 
     function AccountCheckPage({ onLogin, onSignUp, onBack }) {
       return (
@@ -559,7 +562,7 @@
 
       switch (page) {
         case 'welcome':
-          return <WelcomePage onStart={() => setPage('accountCheck')} />;
+          return <WelcomePage onStart={() => setPage('accountCheck')} username={loggedInUser} />;
         case 'accountCheck':
           return <AccountCheckPage
             onLogin={() => setPage('login')}
@@ -570,17 +573,36 @@
           return (<LoginPage onBack={() => setPage('accountCheck')} onLogInSuccess={(user) => {
             setLoggedInUser(user);
             setPage("dashboard"); // all users are sent to dashboard first
-          }}
-          />
+          }} />
           );
 
 
         case 'sign up':
-          return <SignUpPage onBack={() => setPage('accountCheck')} onSignUpSuccess={() => setPage('new dashboard')} />;
+          return (<SignUpPage onBack={() => setPage('accountCheck')} onSignUpSuccess={(newUser) => {
+            setLoggedInUser(newUser);
+            fromNewUser = true;
+            setPage('new dashboard');
+          }}
+          />
+          );
+
         case 'dashboard':
-          return <Dashboard onLogOut={() => setPage('welcome')} onContinue={() => setPage('finances')} onPenny={() => setPage('penny')} setPage={setPage} loggedInUser={loggedInUser} />;
+          return <Dashboard onLogOut={() => {
+            setLoggedInUser(null);
+            setPage('welcome');
+          }}
+            onContinue={() => setPage('finances')} onPenny={() => setPage('penny')} setPage={setPage} loggedInUser={loggedInUser} />;
+
         case 'new dashboard':
-          return <NewDashboard onLogOut={() => setPage('welcome')} onContinue={() => setPage('new finances')} onPenny={() => setPage('penny')} setPage={setPage} />;
+          return <NewDashboard onLogOut={() => {
+            setLoggedInUser(null);
+            setPage('welcome');
+          }}
+            onContinue={() => setPage('new finances')}
+            onPenny={() => setPage('penny')}
+            setPage={setPage}
+            loggedInUser={loggedInUser} />;
+
         case 'demoBudget':
           return <DemoBudgetOverview username={loggedInUser} onBack={() => setPage('dashboard')} />;
         case 'finances':
@@ -591,7 +613,15 @@
         case 'penny':
           return <PennyAI onClick={() => setPage('penny')} onBack={() => setPage('dashboard')} />;
         case 'connect an account':
-          return <ConnectAnAccount onBack={() => setPage('dashboard')} onLogOut={() => setPage('welcome')} />;
+          return (<ConnectAnAccount onBack={() => setPage(fromNewUser ? 'new dashboard' : 'dashboard')} onLogOut={() => {
+            setLoggedInUser(null);
+            fromNewUser = false;
+            setPage('welcome');
+          }}
+            setPage={setPage}
+          />
+          );
+
         default:
           return <div>Page Not Found</div>;
       }
