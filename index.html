@@ -360,34 +360,63 @@
     }
 
 
-    function FinanceOverview({ onLogOut, onBack }) {
+    function FinanceOverview({ onBack }) {
+      const [combineAccounts, setCombineAccounts] = React.useState(true);
+
+      const balances = {
+        checking: 1200,
+        savings: 3400,
+        credit: 560,
+      };
+
+      const totalBalance = balances.checking + balances.savings + balances.credit;
+
       return (
         <div className="container">
-          <h1>here's a quick overview of your finances</h1>
+          <h1>Here's a quick overview of your finances</h1>
 
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '20px',
-            marginTop: '30px',
-            flexWrap: 'wrap'
-          }}>
-            <div className="card">
-              <h3>Checking Account</h3>
-              <p>$1,200.00</p>
-            </div>
-            <div className="card">
-              <h3>Savings Account</h3>
-              <p>$3,400.00</p>
-            </div>
-            <div className="card">
-              <h3>Credit Card balance</h3>
-              <p>$560.00</p>
-            </div>
-
-
+          <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <label>Group all accounts:</label>
+            <input
+              type="checkbox"
+              checked={combineAccounts}
+              onChange={() => setCombineAccounts(!combineAccounts)}
+            />
           </div>
-          <button onClick={onBack} className="back-button"> ← Back </button>
+
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '20px',
+              marginTop: '30px',
+              flexWrap: 'wrap',
+            }}
+          >
+            {combineAccounts ? (
+              <div className="card">
+                <h3>Total Balance</h3>
+                <p>${totalBalance.toFixed(2)}</p>
+              </div>
+            ) : (
+              <>
+                <div className="card">
+                  <h3>Checking Account</h3>
+                  <p>${balances.checking.toFixed(2)}</p>
+                </div>
+                <div className="card">
+                  <h3>Savings Account</h3>
+                  <p>${balances.savings.toFixed(2)}</p>
+                </div>
+                <div className="card">
+                  <h3>Credit Card Balance</h3>
+                  <p>${balances.credit.toFixed(2)}</p>
+                </div>
+              </>
+            )}
+          </div>
+
+          <button onClick={onBack} className="back-button">← Back</button>
         </div>
       );
     }
