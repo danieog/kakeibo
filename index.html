@@ -9,6 +9,7 @@
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
   <title>pocketPenny</title>
 </head>
 
@@ -18,12 +19,23 @@
     /* Storing usernames and passwords for every run in a map */
     const userDatabase = new Map();
     userDatabase.set('nardi', '4432');
+    const userBudget = {
+      income: 0, // total income
+      categories: {
+        food: { budget: 0, spent: 0 },
+        rent: { budget: 0, spent: 0 },
+        transportation: { budget: 0, spent: 0 },
+        entertainment: { budget: 0, spent: 0 },
+        savings: { budget: 0, spent: 0 },
+        other: { budget: 0, spent: 0 }
+      }
+    };
 
     function PennyAI({ onClick, onBack }) {
       return (
         <div className="container">
           <h1> hi! I am Penny, your personal money saver </h1>
-          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+          <div className="button-container">
             <button onClick={onBack} className="back-button"> ← Back </button>
           </div>
 
@@ -37,7 +49,7 @@
           <h1>Welcome to your Dashboard</h1>
           <p>Let's get you started. First step is to connect an account</p>
 
-          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+          <div className="button-container">
             <button className="button-primary" onClick={() => setPage('connect an account')}> Connect a banking account </button>
             <button className="button-primary" onClick={onPenny}> Talk to Penny </button>
             <button className="button-primary" onClick={onLogOut}> Log Out </button>
@@ -46,15 +58,23 @@
       );
     }
 
-    function Dashboard({ onLogOut, onContinue, onPenny, setPage }) {
+    function Dashboard({ onLogOut, onContinue, onPenny, setPage, loggedInUser }) {
       return (
         <div className="container">
           <h1>Welcome to your Dashboard</h1>
           <p>This is your main hub. Ready to see your finances?</p>
 
-          <div style={{ display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
+          <div className="button-container">
             <button className="button-primary" onClick={() => setPage('connect an account')}> Connect a banking account </button>
             <button className="button-primary" onClick={onContinue}> Go to Finances </button>
+
+            {/* Demo budget just for Nardi */}
+            {loggedInUser === "nardi" && (
+              <button className="button-primary" onClick={() => setPage("demoBudget")}>
+                View Your Budget
+              </button>
+            )}
+
             <button className="button-primary" onClick={onPenny}> Talk to Penny </button>
             <button className="button-primary" onClick={onLogOut}> Log Out </button>
           </div>
@@ -62,22 +82,237 @@
       );
     }
 
-    function ConnectAnAccount({ onBack, onLogOut }) {
-      return (
-        <div className="container">
-          <h1>Securely connect a banking account</h1>
-          <p>We use <strong>Plaid</strong> to securely link your financial accounts. Your information is encrypted and never shared without your consent.</p>
+    function BudgetForm({ onSave }) {
+      const [budgetData, setBudgetData] = useState({
+        income: '',
+        food: '',
+        rent: '',
+        transportation: '',
+        entertainment: '',
+        savings: '',
+        other: ''
+      });
 
-          <div style={{ marginTop: '30px' }}>
-            {/* This button will launch Plaid Link */}
-            <button className="button-primary">
-              Connect with Plaid
-            </button>
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setBudgetData({ ...budgetData, [name]: value });
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave(budgetData); // Saving data when the form is submitted
+      };
+
+      return (
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Income: </label>
+            <input type="number" name="income" value={budgetData.income} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Food: </label>
+            <input type="number" name="food" value={budgetData.food} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Rent: </label>
+            <input type="number" name="rent" value={budgetData.rent} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Transportation: </label>
+            <input type="number" name="transportation" value={budgetData.transportation} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Entertainment: </label>
+            <input type="number" name="entertainment" value={budgetData.entertainment} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Savings: </label>
+            <input type="number" name="savings" value={budgetData.savings} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Other: </label>
+            <input type="number" name="other" value={budgetData.other} onChange={handleChange} />
+          </div>
+          <button type="submit">Save Budget</button>
+        </form>
+      );
+    }
+
+
+    function ExpenseForm({ onAddExpense }) {
+      const [expenseData, setExpenseData] = useState({ category: '', amount: '' });
+
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setExpenseData({ ...expenseData, [name]: value });
+      }
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        onAddExpense(expenseData);
+      };
+
+      return (
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label> Category: </label>
+            <select name="category" value={expenseData.category} onChange={handleChange}>
+              <option value="food"> Food </option>
+              <option value="rent"> Rent </option>
+              <option value="transportation"> Transportation </option>
+              <option value="entertainment"> Entertainment </option>
+              <option value="savings"> Savings </option>
+            </select>
+          </div>
+          <div>
+            <label> Amount </label>
+            <input type="number" name="amount" value={expenseData.amount} onChange={handleChange} />
+          </div>
+          <button type="submit"> Add Expense </button>
+        </form>
+      );
+    }
+
+    // Modified BudgetOverview for demo purposes
+    function DemoBudgetOverview({ username, onBack }) {
+      const demoBudgetData = {
+        income: 1200, // part-time job / stipend
+        categories: {
+          rent: { budget: 600, spent: 580 },  // tight budget, but she makes it work
+          food: { budget: 200, spent: 180 },  // groceries + occasional eating out
+          transportation: { budget: 60, spent: 40 }, // metro card / gas
+          entertainment: { budget: 80, spent: 45 },  // Netflix, social life, low-key
+          savings: { budget: 150, spent: 0 },  // trying to put money away in a HYSA
+          other: { budget: 110, spent: 60 },   // textbooks, unexpected costs
+        },
+      };
+
+      return (
+        <div className="container" style={{ alignItems: 'stretch', padding: '2rem' }}>
+          <button onClick={onBack} className="back-button">← Back</button>
+          <h2 style={{ marginBottom: '1.5rem', fontSize: '2rem' }}>
+            Here's your monthly budget, Nardi 🎓
+          </h2>
+
+          <div className="card" style={{ margin: '0 auto 2rem auto', width: 'fit-content' }}>
+            <h3>Total Income</h3>
+            <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#7e3ff2' }}>
+              ${demoBudgetData.income}
+            </p>
           </div>
 
-          <div style={{ marginTop: '30px', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-            <button className="back-button" onClick={onBack}> ← Back </button>
-            <button className="button-primary" onClick={onLogOut}> Log Out </button>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '1.5rem',
+            }}
+          >
+            {Object.keys(demoBudgetData.categories).map((category) => {
+              const data = demoBudgetData.categories[category];
+              const remaining = data.budget - data.spent;
+              const progress = data.budget > 0 ? (data.spent / data.budget) * 100 : 0;
+              const progressColor = progress > 100 ? '#dc2626' : '#7e3ff2';
+
+              return (
+                <div className="card" key={category}>
+                  <h4 style={{ marginBottom: '0.5rem', textTransform: 'capitalize' }}>
+                    {category}
+                  </h4>
+                  <p>Budget: ${data.budget}</p>
+                  <p>Spent: ${data.spent}</p>
+                  <p>
+                    Remaining: <strong>${remaining}</strong>
+                  </p>
+
+                  <div
+                    style={{
+                      marginTop: '1rem',
+                      backgroundColor: '#e5e7eb',
+                      height: '10px',
+                      width: '100%',
+                      borderRadius: '5px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${Math.min(progress, 100)}%`,
+                        backgroundColor: progressColor,
+                        height: '100%',
+                        transition: 'width 0.3s ease-in-out',
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    function BudgetOverview({ budgetData }) {
+      return (
+        <div className="container" style={{ alignItems: 'stretch', padding: '2rem' }}>
+          <h2 style={{ marginBottom: '1.5rem', fontSize: '2rem' }}>
+            Here's your monthly budget, {username}
+          </h2>
+
+          <div className="card" style={{ margin: '0 auto 2rem auto', width: 'fit-content' }}>
+            <h3>Total Income</h3>
+            <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#7e3ff2' }}>
+              ${budgetData.income}
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '1.5rem',
+            }}
+          >
+            {Object.keys(budgetData.categories).map((category) => {
+              const data = budgetData.categories[category];
+              const remaining = data.budget - data.spent;
+              const progress = data.budget > 0 ? (data.spent / data.budget) * 100 : 0;
+              const progressColor = progress > 100 ? '#dc2626' : '#7e3ff2';
+
+              return (
+                <div className="card" key={category}>
+                  <h4 style={{ marginBottom: '0.5rem', textTransform: 'capitalize' }}>
+                    {category}
+                  </h4>
+                  <p>Budget: ${data.budget}</p>
+                  <p>Spent: ${data.spent}</p>
+                  <p>
+                    Remaining:{' '}
+                    <span style={{ fontWeight: 'bold' }}>${remaining}</span>
+                  </p>
+
+                  <div
+                    style={{
+                      marginTop: '1rem',
+                      backgroundColor: '#e5e7eb',
+                      height: '10px',
+                      width: '100%',
+                      borderRadius: '5px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${Math.min(progress, 100)}%`,
+                        backgroundColor: progressColor,
+                        height: '100%',
+                        transition: 'width 0.3s ease-in-out',
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       );
@@ -85,35 +320,103 @@
 
 
 
+    function ConnectAnAccount({ onBack, onLogOut }) {
+      const SANDBOX_LINK_TOKEN = "4673f86ae69a1359a337c15cd65448"; // Sandbox key for demo purposes
 
-    function FinanceOverview({ onLogOut, onBack }) {
+      const launchPlaid = () => {
+        const handler = window.Plaid.create({
+          token: SANDBOX_LINK_TOKEN,
+          onSuccess: (public_token, metadata) => {
+            alert("✅ Connected! Public Token:\n" + public_token);
+            console.log("Metadata:", metadata);
+          },
+          onExit: (err, metadata) => {
+            console.warn("User exited Plaid Link", err, metadata);
+          },
+        });
+
+        handler.open();
+      };
+
       return (
         <div className="container">
-          <h1>here's a quick overview of your finances</h1>
+          <h1>Securely connect a banking account</h1>
+          <p>
+            We use <strong>Plaid</strong> to securely link your financial accounts.
+            Your information is encrypted and never shared without your consent.
+          </p>
 
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '20px',
-            marginTop: '30px',
-            flexWrap: 'wrap'
-          }}>
-            <div className="card">
-              <h3>Balance</h3>
-              <p>$1,200.00</p>
-            </div>
-            <div className="card">
-              <h3>Savings</h3>
-              <p>$3,400.00</p>
-            </div>
-            <div className="card">
-              <h3>This Month's Spending</h3>
-              <p>$560.00</p>
-            </div>
-
-
+          <div style={{ marginTop: "30px" }}>
+            <button className="button-primary" onClick={launchPlaid}>
+              Connect with Plaid
+            </button>
           </div>
-          <button onClick={onBack} className="back-button"> ← Back </button>
+
+          <div style={{ marginTop: "30px", display: "flex", gap: "20px", flexWrap: "wrap" }}>
+            <button className="back-button" onClick={onBack}> ← Back </button>
+          </div>
+        </div>
+      );
+    }
+
+
+    function FinanceOverview({ onBack }) {
+      const [combineAccounts, setCombineAccounts] = React.useState(true);
+
+      const balances = {
+        checking: 1200,
+        savings: 3400,
+        credit: 560,
+      };
+
+      const totalBalance = balances.checking + balances.savings - balances.credit;
+
+      return (
+        <div className="container">
+          <h1>Here's a quick overview of your finances</h1>
+
+          <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <label>Group all accounts:</label>
+            <input
+              type="checkbox"
+              checked={combineAccounts}
+              onChange={() => setCombineAccounts(!combineAccounts)}
+            />
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '20px',
+              marginTop: '30px',
+              flexWrap: 'wrap',
+            }}
+          >
+            {combineAccounts ? (
+              <div className="card">
+                <h3>Total Balance</h3>
+                <p>${totalBalance.toFixed(2)}</p>
+              </div>
+            ) : (
+              <>
+                <div className="card">
+                  <h3>Checking Account</h3>
+                  <p>${balances.checking.toFixed(2)}</p>
+                </div>
+                <div className="card">
+                  <h3>Savings Account</h3>
+                  <p>${balances.savings.toFixed(2)}</p>
+                </div>
+                <div className="card">
+                  <h3>Credit Card Balance</h3>
+                  <p style={{ color: 'red' }}>-${balances.credit.toFixed(2)}</p>
+                </div>
+              </>
+            )}
+          </div>
+
+          <button onClick={onBack} className="back-button">← Back</button>
         </div>
       );
     }
@@ -126,18 +429,22 @@
 
       /* Checking for existing accounts or predefined username and password in map for demo login */
       const handleLogin = () => {
-        if (userDatabase.has(username) && userDatabase.get(username) === password) {
+        if (username === "nardi" && password === "4432") {
           setError('');
-          onLogInSuccess();
-        } else { /* Maybe split this into specific invalidity */
-          setError('Invalid username or password')
-        };
-      }
+          onLogInSuccess("nardi"); // special demo user
+        } else if (userDatabase.has(username) && userDatabase.get(username) === password) {
+          setError('');
+          onLogInSuccess(username);
+        } else {
+          setError('Invalid username or password');
+        }
+      };
+
 
 
       return (
         <div className="container">
-          <h2> login </h2>
+          <h2> Login </h2>
           <input type="text" placeholder="Username" className="input-field" value={username} onChange={(e) => setUsername(e.target.value)} />
           <input type="password" placeholder="Password" className="input-field" value={password} onChange={(e) => setPassword(e.target.value)} />
           {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -168,7 +475,7 @@
 
       return (
         <div className="container">
-          <h2> sign up </h2>
+          <h2> Sign up </h2>
           <input type="text" placeholder="Username" className="input-field" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} />
           <input type="password" placeholder="Password" className="input-field" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
           <input type="password" placeholder="Confirm Password" className="input-field" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
@@ -214,6 +521,41 @@
 
     function App() {
       const [page, setPage] = React.useState('welcome');
+      const [loggedInUser, setLoggedInUser] = React.useState(null);
+
+      const [budgetData, setBudgetData] = React.useState({
+        income: 0,
+        categories: {
+          food: { budget: 0, spent: 0 },
+          rent: { budget: 0, spent: 0 },
+          transportation: { budget: 0, spent: 0 },
+          entertainment: { budget: 0, spent: 0 },
+          savings: { budget: 0, spent: 0 },
+          other: { budget: 0, spent: 0 }
+        }
+      });
+
+      const handleSaveBudget = (newBudgetData) => {
+        setBudgetData({
+          income: newBudgetData.income,
+          categories: {
+            food: { budget: newBudgetData.food, spent: 0 },
+            rent: { budget: newBudgetData.rent, spent: 0 },
+            transportation: { budget: newBudgetData.transportation, spent: 0 },
+            entertainment: { budget: newBudgetData.entertainment, spent: 0 },
+            savings: { budget: newBudgetData.savings, spent: 0 },
+            other: { budget: newBudgetData.other, spent: 0 }
+          }
+        });
+      };
+
+      const handleAddExpense = (expenseData) => {
+        setBudgetData((prevData) => {
+          const updatedCategories = { ...prevData.categories };
+          updatedCategories[expenseData.category].spent += parseFloat(expenseData.amount);
+          return { ...prevData, categories: updatedCategories };
+        });
+      };
 
       switch (page) {
         case 'welcome':
@@ -225,21 +567,33 @@
             onBack={() => setPage('welcome')}
           />;
         case 'login':
-          return <LoginPage onBack={() => setPage('accountCheck')} onLogInSuccess={() => setPage('dashboard')} />;
+          return (<LoginPage onBack={() => setPage('accountCheck')} onLogInSuccess={(user) => {
+            setLoggedInUser(user);
+            setPage("dashboard"); // all users are sent to dashboard first
+          }}
+          />
+          );
+
+
         case 'sign up':
           return <SignUpPage onBack={() => setPage('accountCheck')} onSignUpSuccess={() => setPage('new dashboard')} />;
         case 'dashboard':
-          return <Dashboard onLogOut={() => setPage('welcome')} onContinue={() => setPage('finances')} onPenny={() => setPage('penny')} setPage={setPage} />
+          return <Dashboard onLogOut={() => setPage('welcome')} onContinue={() => setPage('finances')} onPenny={() => setPage('penny')} setPage={setPage} loggedInUser={loggedInUser} />;
         case 'new dashboard':
           return <NewDashboard onLogOut={() => setPage('welcome')} onContinue={() => setPage('new finances')} onPenny={() => setPage('penny')} setPage={setPage} />;
+        case 'demoBudget':
+          return <DemoBudgetOverview username={loggedInUser} onBack={() => setPage('dashboard')} />;
         case 'finances':
-          return <FinanceOverview onLogOut={() => setPage('accountCheck')} onBack={() => setPage('dashboard')} />
+          return loggedInUser === "nardi"
+            ? <FinanceOverview onBack={() => setPage('dashboard')} onLogOut={() => setPage('welcome')} />
+            : <BudgetOverview budgetData={budgetData} />;
+
         case 'penny':
-          return <PennyAI onClick={() => setPage('penny')} onBack={() => setPage('dashboard')} />
+          return <PennyAI onClick={() => setPage('penny')} onBack={() => setPage('dashboard')} />;
         case 'connect an account':
-          return <ConnectAnAccount onBack={() => setPage('new dashboard')} onLogOut={() => setPage('welcome')} />
+          return <ConnectAnAccount onBack={() => setPage('dashboard')} onLogOut={() => setPage('welcome')} />;
         default:
-          return <WelcomePage onStart={() => setPage('accountCheck')} />;
+          return <div>Page Not Found</div>;
       }
     }
 
