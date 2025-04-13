@@ -1,31 +1,33 @@
-import ChatForm from "./components/ChatForm";
 import React, { useState } from "react";
+import ChatForm from "./components/ChatForm";
 import ChatMessage from "./components/ChatMessage";
+import GenerateBotResponse from "./components/GenerateBotResponse"; // Ensure this function is correctly implemented and exported
 
 const App = () => {
-  const [chatHistory, setChatHistory] = useState([]); // State to store chat history
-
-  const generateBotResponse = async (history) => {
-    history = history.map(({ sender, text }) => 
-      ({ sender, parts: [text] }));
-
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: history}),
-    }
-
+  const [chatHistory, setChatHistory] = useState([
+    { sender: "bot", text: "hello! i am penny, your personal finance assistant. how can i help you today?" }
+  ]); // State to store chat history with initial bot greeting
+  // console.log("Initial chat history:", chatHistory);
+  const handleSendMessage = async (userMessage) => {
+    // Add user message to chat history
+    const updatedHistory = [...chatHistory, { sender: "user", text: userMessage }];
+    setChatHistory(updatedHistory);
+    
     try {
-      const response = await fetch(import.meta.env.VITE_API_URL, requestOptions);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Something went wrong");
-        
-      console.log(data);
+      // Show loading message
+      setChatHistory([...updatedHistory, { sender: "bot", text: "..." }]);
+      
+      // Call external AI service
+      const response = await GenerateBotResponse(updatedHistory);
+      
+      // Replace loading with actual response
+      const finalHistory = [...updatedHistory, { sender: "bot", text: response }];
+      setChatHistory(finalHistory);
     } catch (error) {
-      console.log(error);
-    }
-  };
-
+      console.error("Error generating response:", error);
+      setChatHistory([...updatedHistory, { sender: "bot", text: "Sorry, I encountered an error." }]);
+  }
+};
   return (
     <div className="container">
       <div className="chatbot-popup">
@@ -44,13 +46,6 @@ const App = () => {
 
         {/* Body */}
         <div className="chat-body">
-          <div className="message bot-message">
-            <p className="message-text">
-              hello! i am penny, your personal finance assistant. how can i help
-              you today?
-            </p>
-          </div>
-
           {chatHistory.map((message, index) => (
             <ChatMessage key={index} message={message} />
           ))}
@@ -59,14 +54,13 @@ const App = () => {
         {/* Footer */}
         <div className="chat-footer">
           <ChatForm
-            chatHistory={chatHistory}
-            setChatHistory={setChatHistory}
-            generateBotResponse={generateBotResponse}
+            onSendMessage={handleSendMessage}
           />
         </div>
       </div>
     </div>
   );
 };
+
 
 export default App;
